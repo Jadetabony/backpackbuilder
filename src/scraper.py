@@ -11,11 +11,8 @@ if __name__ == '__main__':
     url = 'https://www.rei.com/c/hiking-jackets?r=c&ir=category%3Ahiking-jackets&page=1'
     path_to_chromedriver = '/Users/Jade/Desktop/chromedriver' # change path as needed
     browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+    browser.get(url)
+    sleep(10)
 
-    r = requests.get(url).content
-    soup = BeautifulSoup(r, 'lxml')
-    print soup
-    links = []
-    for l in soup.findAll('div', {'class': 'product-title'}):
-        links.append(l.a.href)
-    print links
+    parser = html.fromstring(browser.page_source,browser.current_url)
+    prod_links = parser.xpath('//div[@class="product-title"]/a')
