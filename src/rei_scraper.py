@@ -6,6 +6,8 @@ from time import sleep
 
 
 def getNumberItems(browser, url):
+    """
+    """
     browser.get(url)
     sleep(5)
     parser = html.fromstring(browser.page_source, browser.current_url)
@@ -14,6 +16,7 @@ def getNumberItems(browser, url):
         if i.isdigit():
             item_cnt = int(i)
     return item_cnt
+
 
 def grabLinks(browser, base_url, page_number):
     links = []
@@ -27,7 +30,7 @@ def grabLinks(browser, base_url, page_number):
 
 if __name__ == '__main__':
     url = 'https://www.rei.com/c/hiking-jackets?r=c&pagesize=30&ir=category%3Ahiking-jackets&page=1'
-    path_to_chromedriver = '/Users/Jade/Desktop/chromedriver' # change path as needed
+    path_to_chromedriver = '/Users/Jade/Desktop/chromedriver'  # change path as needed
     browser = webdriver.Chrome(executable_path=path_to_chromedriver)
 
     item_cnt = getNumberItems(browser, url)
