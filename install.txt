@@ -8,3 +8,7 @@ chromedriver
 pandas
 numpy
 json
+boto
+cStringIO
+urllib
+Image
