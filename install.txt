@@ -1,0 +1,10 @@
+Selenium
+lxml
+mongodb
+pymongo
+bs4
+requests
+chromedriver
+pandas
+numpy
+json

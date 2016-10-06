@@ -6,8 +6,14 @@ from time import sleep
 
 
 def getNumberItems(browser, url):
-    """
-    """
+    """This function uses lxml's html parser to identify and return the number of items in a product category.
+    	Args:
+    		browser (string):  Browser used to access url. (webdriver.Chrome)
+    		url (string):  Product category url.
+
+    	Returns:
+    		Int: Number of items in a product category.
+"""
     browser.get(url)
     sleep(5)
     parser = html.fromstring(browser.page_source, browser.current_url)
@@ -18,7 +24,17 @@ def getNumberItems(browser, url):
     return item_cnt
 
 
-def grabLinks(browser, base_url, page_number):
+def grabPageLinks(browser, base_url, page_number):
+    """ This function uses lxml's html parser to identify and return individual product  links from a specific page. This function is called by grabAllCatLinks.
+
+    	Args:
+    		browser (string): Browser used to access url. (webdriver.Chrome)
+    		Base_url (string): Product category url.
+    		Page_number (int): Page number.
+
+    	Returns:
+    List: List of product links per page.
+"""
     links = []
     browser.get(base_url+str(page_number))
     sleep(5)
@@ -28,24 +44,48 @@ def grabLinks(browser, base_url, page_number):
     return links
 
 
-if __name__ == '__main__':
-    url = 'https://www.rei.com/c/hiking-jackets?r=c&pagesize=30&ir=category%3Ahiking-jackets&page=1'
-    path_to_chromedriver = '/Users/Jade/Desktop/chromedriver'  # change path as needed
-    browser = webdriver.Chrome(executable_path=path_to_chromedriver)
+def grabAllCatLinks(browser, category_name):
+    """ This function return all the product links in a specified category.
 
-    item_cnt = getNumberItems(browser, url)
+    This function accesses a predetermined product category page and calls getNumberItems to get the number of individual products and then calculates the number of pages for the category. This function then calls grabPageLinks for each page in the product category.
+
+    	Args:
+    		browser (string):  Browser used to access url. (webdriver.Chrome)
+    		Category_name (string):  Category name from predetermined list. Refer to REI.com for exact category names.
+
+    	Returns:
+    		List: List of products links per category.
+"""
+    category_name = category_name.lower().replace(' ', '-')
+    base_url = 'https://www.rei.com/c/' + category_name + '?r=c&pagesize=30&ir=category%3A' + category_name + '&page='
+    item_cnt = getNumberItems(browser, base_url+str(1))
 
     final_links = []
     page_number = 1
-    base_url = 'https://www.rei.com/c/hiking-jackets?r=c&pagesize=30&ir=category%3Ahiking-jackets&page='
     while item_cnt > 0:
-        final_links.extend(grabLinks(browser, base_url, page_number))
+        final_links.extend(grabPageLinks(browser, base_url, page_number))
         page_number += 1
         item_cnt -= 30
+    return final_links
+
+
+if __name__ == '__main__':
+
+    prod_cat = []
+    with open('../data/product_categories.txt', 'r') as fp:
+        for line in fp:
+            prod_cat.append(line.strip())
+
+    # ?? Should these varible be a the top??
+    path_to_chromedriver = '/Users/boydbrown/Desktop/chromedriver'  # change path as needed
+    browser = webdriver.Chrome(executable_path=path_to_chromedriver)
 
     # write to a text file
-    f = open("../data/productlinks.txt", "a")
-    for l in final_links:
-        f.write(l)
-        f.write('\n')
+    f = open("../data/product_links.txt", "a")
+
+    for cat in prod_cat:
+        final_links = grabAllCatLinks(browser, cat)
+        for l in final_links:
+            f.write(l + '\n')
+
     f.close()
