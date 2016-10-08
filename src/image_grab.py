@@ -1,7 +1,7 @@
 import boto
 import cStringIO
 import urllib
-import Image
+from PIL import Image
 from pymongo import MongoClient
 
 
@@ -18,7 +18,7 @@ def imageLinkToS3(image_link, image_title, s3_connection):
 
         s3_connection (boto connection): Connection to the appropriate S3 bucket using boto library.
 
-    Todo:
+    TODO:
         * There has to be a better way to access all of the links.
 
     """
@@ -47,10 +47,12 @@ if __name__ == '__main__':
 
     conn = boto.connect_s3()
     # Connect to bucket and create key
-    b = conn.get_bucket(backpackbuilder)
+    b = conn.get_bucket('backpackbuilder')
 
     for entries in rei.find({}):
         title = entries['title']
-        links = entries['img_links'])
+        print title
+        links = entries['img_list']
+        print links
         for url in links:
-            imageLinkToS3(link, title, b)
+            imageLinkToS3(url, title, b)
