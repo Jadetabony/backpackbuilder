@@ -99,8 +99,7 @@ if __name__ == '__main__':
     # write product links to a txt file, one txt file per category in order to keep the categories seperated.
     for cat in prod_cat:
         # reformat category name so that it can be incorporated into url
-        cat = cat.lower().replace(' ', '-')
-        txt_filename = '../data/' + cat + 'product-links.txt'
+        txt_filename = '../data/category_links/' + cat + 'product-links.txt'
         # open/create txt file for each category
         product_txt_file = open(txt_filename, "a")
         # for each link the links collected by grab all links, write to txt file
