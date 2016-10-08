@@ -36,7 +36,6 @@ def imageLinkToS3(image_link, image_title, s3_connection):
     # Now we connect to our s3 bucket and upload from memory
     # credentials stored in environment AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
     k = s3_connection.new_key(image_title + '.png')
-
     # Note we're setting contents from the in-memory string provided by cStringIO
     k.set_contents_from_string(out_im2.getvalue())
 
