@@ -21,17 +21,60 @@ def productInfoToMDB(collection, url):
     soup = BeautifulSoup(r.content, 'lxml')
     dic['soup'] = str(soup)
     dic['title'] = soup.select('title')[0].text
-    dic['description'] = soup.select('p.product-primary-description')[0].text.strip()
-    dic['details'] = soup.select('ul.product-item-details')[0].text.split('\n')
-    dic['specs'] = parseSpecs([u.strip() for u in soup.select('table.product-spec-table')[0].text.split('\n') if u != ''])
+
+    try:
+        dic['description'] = soup.select('p.product-primary-description')[0].text.strip()
+    except IndexError:
+        dic['description'] = 'Product discription not available.'
+
+    try:
+        dic['details'] = soup.select('ul.product-item-details')[0].text.split('\n')
+    except IndexError:
+        dic['details'] = 'Product details not available.'
+
+    try:
+        dic['specs'] = parseSpecs([u.strip() for u in soup.select('table.product-spec-table')[0].text.split('\n') if u != ''])
+    except IndexError:
+        dic['specs'] = 'Product specs not available.'
+
     md = json.loads(soup.findAll('script', {'data-client-store': 'page-meta-data'})[0].text)
     dic['meta_data'] = md
-    dic['average_rating'] = md['averageRating']
-    dic['color_count'] = md['pdpcolornum']
-    dic['gender'] = md['productGender']
-    dic['review_count'] = md['reviewCount']
-    dic['product_path'] = md['productCategoryPath']
-    dic['color_list'] = json.loads(soup.findAll('script', {'data-client-store': 'carousel-images'})[0].text).keys()
+
+    try:
+        dic['average_rating'] = md['averageRating']
+    except:
+        dic['average_rating'] = "Product rating not avialable."
+
+    try:
+        dic['color_count'] = md['pdpcolornum']
+    except KeyError:
+        dic['color_count'] = 'No color options'
+
+    try:
+        dic['gender'] = md['productGender']
+    except KeyError:
+        dic['gender'] = 'unisex'
+
+    try:
+        dic['review_count'] = md['reviewCount']
+    except KeyError:
+        dic['review_count'] = "Product rating not avialable."
+
+    try:
+        dic['product_path'] = md['productCategoryPath']
+    except KeyError:
+        dic['product_path'] = 'null'
+
+    try:
+        dic['color_list'] = json.loads(soup.findAll('script', {'data-client-store': 'carousel-images'})[0].text).keys()
+    except IndexError:
+        dic['color_list'] = 'No color options'
+
+    # Adds image paths to 'img_list'.
+    img_list = []
+    for l in soup.findAll('img',{'class': 'product-image-thumbnail'}):
+        img_list.append(l['data-high-res-img'])
+    dic['img_list'] = img_list
     collection.insert_one(dic)
 
 
